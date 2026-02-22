@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petals Around the Rose</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Poppins:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 50px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        .title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: #764ba2;
+            font-size: 1.1em;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .rose-emoji {
+            font-size: 2.5em;
+            margin: 15px 0;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-bottom: 40px;
+        }
+
+        .game-section {
+            animation: slideUp 0.8s ease-out;
+        }
+
+        .rules-section {
+            animation: slideUp 0.8s ease-out 0.2s both;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8em;
+            color: #764ba2;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dice-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .die {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 12px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 2px;
+            padding: 8px;
+            cursor: default;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            align-items: center;
+            justify-items: center;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #333;
+            border-radius: 50%;
+        }
+
+        .die:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .die.rolling {
+            animation: rollDie 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-roll {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-roll:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-roll:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-roll:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-guess {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-guess:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-guess:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-guess:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-box {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .result-box.correct {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1) 0%, rgba(56, 142, 60, 0.1) 100%);
+            border: 2px solid #4caf50;
+        }
+
+        .result-box.wrong {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.1) 100%);
+            border: 2px solid #f44336;
+        }
+
+        .result-label {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .result-box.correct .result-label {
+            color: #2e7d32;
+        }
+
+        .result-box.wrong .result-label {
+            color: #c62828;
+        }
+
+        .result-answer {
+            font-size: 2.5em;
+            font-weight: 900;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .result-box.correct .result-answer {
+            color: #4caf50;
+        }
+
+        .result-box.wrong .result-answer {
+            color: #f44336;
+        }
+
+        .rules-text {
+            color: #555;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .rules-text strong {
+            color: #667eea;
+        }
+
+        .instructions-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .instructions-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #764ba2;
+            margin-bottom: 15px;
+        }
+
+        .instructions-text {
+            color: #555;
+            line-height: 1.7;
+            font-size: 0.9em;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+
+        @keyframes rollDie {
+            0% {
+                transform: rotateX(0) rotateY(0) rotateZ(0) scale(1);
+            }
+            50% {
+                transform: rotateX(720deg) rotateY(720deg) rotateZ(180deg) scale(1.1);
+            }
+            100% {
+                transform: rotateX(0) rotateY(0) rotateZ(0) scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px;
+            }
+
+            .title {
+                font-size: 2.5em;
+            }
+
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .dice-container {
+                gap: 10px;
+            }
+
+            .die {
+                width: 70px;
+                height: 70px;
+                font-size: 2.5em;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">Petals Around the Rose</h1>
+            <div class="rose-emoji">🌹</div>
+            <p class="subtitle">Can you figure out the pattern?</p>
+        </div>
+
+        <div class="content-wrapper">
+            <!-- Game Section -->
+            <div class="game-section">
+                <h2 class="section-title">🎲 The Game</h2>
+                
+                <div class="dice-container" id="diceContainer">
+                    <!-- Dice will be generated here -->
+                </div>
+
+                <div class="input-group">
+                    <label for="guessInput">Your Guess:</label>
+                    <input 
+                        type="number" 
+                        id="guessInput" 
+                        placeholder="Enter the score..."
+                        min="0"
+                    >
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-roll" id="rollBtn">Roll Dice</button>
+                    <button class="btn-guess" id="guessBtn" disabled>Accept Guess</button>
+                </div>
+
+                <div id="resultBox"></div>
+            </div>
+
+            <!-- Rules Section -->
+            <div class="rules-section">
+                <h2 class="section-title">📖 Rules</h2>
+                
+                <p class="rules-text">
+                    The name of the game is <strong>Petals Around the Rose</strong>. The computer will roll five dice and ask you to guess the score for the roll.
+                </p>
+
+                <p class="rules-text" style="margin-top: 15px;">
+                    The score will always be <strong>zero or an even number</strong>. Your mission is to work out how the computer calculates the score and become a <strong>Pentate of the Rose</strong>.
+                </p>
+
+                <div class="instructions-section">
+                    <h3 class="instructions-title">How to Play:</h3>
+                    <ol class="instructions-text" style="margin-left: 20px;">
+                        <li style="margin-bottom: 10px;">Click on <strong>"Roll Dice"</strong> to start the game.</li>
+                        <li style="margin-bottom: 10px;">Type in your guess for the score.</li>
+                        <li style="margin-bottom: 10px;">Click on <strong>"Accept Guess"</strong> to get the result.</li>
+                        <li>Then either click on <strong>"Roll Dice"</strong> for another turn.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const diceContainer = document.getElementById('diceContainer');
+        const guessInput = document.getElementById('guessInput');
+        const rollBtn = document.getElementById('rollBtn');
+        const guessBtn = document.getElementById('guessBtn');
+        const resultBox = document.getElementById('resultBox');
+
+        let currentDice = [];
+        let gameStarted = false;
+
+        // Calculate the score: count petals (dots that are not the center)
+        // The pattern: only odd numbers (1, 3, 5) count as "petals"
+        // 1 = 0 petals, 3 = 2 petals, 5 = 4 petals
+        function calculateScore(dice) {
+            const petalCounts = {
+                1: 0,
+                2: 0,
+                3: 2,
+                4: 0,
+                5: 4,
+                6: 0
+            };
+            
+            return dice.reduce((sum, die) => sum + petalCounts[die], 0);
+        }
+
+        function rollDice() {
+            currentDice = Array(5).fill(0).map(() => Math.floor(Math.random() * 6) + 1);
+            
+            // Animate dice rolling
+            const dice = document.querySelectorAll('.die');
+            dice.forEach((die, index) => {
+                die.classList.add('rolling');
+                setTimeout(() => {
+                    die.innerHTML = getDotDisplay(currentDice[index]);
+                    die.classList.remove('rolling');
+                }, 600);
+            });
+
+            gameStarted = true;
+            guessInput.value = '';
+            guessInput.focus();
+            resultBox.innerHTML = '';
+            guessBtn.disabled = false;
+        }
+
+        function getDotDisplay(number) {
+            // Define dot positions for each die face (3x3 grid: 0-8 positions)
+            // 0 1 2
+            // 3 4 5
+            // 6 7 8
+            const dotPositions = {
+                1: [4],              // center
+                2: [0, 8],           // opposite corners
+                3: [0, 4, 8],        // diagonal
+                4: [0, 2, 6, 8],     // four corners
+                5: [0, 2, 4, 6, 8],  // four corners + center
+                6: [0, 2, 3, 5, 6, 8] // two columns
+            };
+
+            const positions = dotPositions[number] || [];
+            const dots = [];
+            
+            for (let i = 0; i < 9; i++) {
+                if (positions.includes(i)) {
+                    dots.push(`<div class="dot"></div>`);
+                } else {
+                    dots.push(`<div style="visibility: hidden;"><div class="dot"></div></div>`);
+                }
+            }
+            
+            return dots.join('');
+        }
+
+        function checkGuess() {
+            if (!gameStarted) {
+                alert('Please roll the dice first!');
+                return;
+            }
+
+            const guess = parseInt(guessInput.value);
+            
+            if (isNaN(guess)) {
+                alert('Please enter a valid number!');
+                return;
+            }
+
+            const correctScore = calculateScore(currentDice);
+            const isCorrect = guess === correctScore;
+
+            resultBox.innerHTML = `
+                <div class="result-box ${isCorrect ? 'correct' : 'wrong'}">
+                    <div class="result-label">${isCorrect ? '✓ CORRECT!' : '✗ WRONG!'}</div>
+                    <div class="result-answer">${correctScore}</div>
+                </div>
+            `;
+
+            if (isCorrect) {
+                resultBox.innerHTML += `<div style="text-align: center; margin-top: 15px; color: #4caf50; font-weight: 600; font-size: 1.1em;">You're a Pentate of the Rose! 🌹</div>`;
+            }
+
+            gameStarted = false;
+            guessBtn.disabled = true;
+        }
+
+        // Initialize dice display
+        for (let i = 0; i < 5; i++) {
+            const die = document.createElement('div');
+            die.className = 'die';
+            // Create empty 3x3 grid
+            for (let j = 0; j < 9; j++) {
+                const emptyDot = document.createElement('div');
+                emptyDot.style.visibility = 'hidden';
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                emptyDot.appendChild(dot);
+                die.appendChild(emptyDot);
+            }
+            diceContainer.appendChild(die);
+        }
+
+        // Event listeners
+        rollBtn.addEventListener('click', rollDice);
+        guessBtn.addEventListener('click', checkGuess);
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !guessBtn.disabled) {
+                checkGuess();
+            }
+        });
+
+        // Auto focus input after roll
+        rollBtn.addEventListener('click', () => {
+            setTimeout(() => guessInput.focus(), 650);
+        });
+    </script>
+</body>
+</html>
